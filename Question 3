@@ -1,1 +1,25 @@
+def detect_loop(n):
 
+    #We want to create a list of the values in the aliquot sequence for n so we know if a value repeats
+    repeats = [n]
+    #Print the first value n
+#    print(n)
+
+
+    #Compute the next term by using the previously defined function s(n)
+    next_term = s(n)
+
+    #We then create a loop for when the next term in the sequence is NOT repeated
+    while next_term not in repeats:
+        #If the next term is not in our repeats list, we print this value
+#        print(next_term)    
+        #We then add this term to our repeats list 
+        repeats.append(next_term)
+        #We then make our current term the term we just used
+        n = next_term
+        #We then compute the next term using function s(n) and then repeat this loop until a term repeats
+        next_term = s(n)
+
+    #A term has repeated so it exits the loop and prints the repeating term
+#    print("The sequence now loops")
+    return next_term
