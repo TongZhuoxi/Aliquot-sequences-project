@@ -57,5 +57,3 @@ def count_reason(m, k, cutoff):
     names = ['Terminates at 0', 'Loops', 'Goes above threshold', 'Goes beyond number of iterations']
     
     return names, [zero, loop, cutoff_count, k_limit]
-
-%timeit count_reason(20000, 30, 10**9)
