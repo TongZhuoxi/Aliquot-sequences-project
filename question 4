@@ -1,1 +1,61 @@
+#Either 1)Terminates at 0 2)Enters a loop 3)Sequence cut short because there's more than k terms in sequence or 4)Sequence cut short because a value of a term has exceeded i
 
+#We first want to determine the ending of the different aliquot sequences
+def sequence_end(n, k, cutoff):
+    
+    #This is again for the loops
+    repeats = {n}
+
+    #Generate k terms 
+    for i in range(k - 1):
+
+        #Want to find the next term in the sequence
+        next_term = s(n)
+
+        #Ending 1 - terminates at 0
+        if next_term == 0:
+            return "zero"
+
+        #Ending 2 - term exceeds i
+        if next_term > cutoff:
+            return "cutoff"
+
+        #Ending 3 - term repeats
+        if next_term in repeats:
+            return "loop"
+
+        #If term NOT in 'repeats' - add this term to set of repeats and continue sequence
+        repeats.add(next_term)
+        n = next_term
+
+    #Ending 4 - greater than k terms - has to be this if it's not the others?     
+    return "k_limit"
+
+#NOw we want to count how many sequences are in each category of ending
+def count_reason(m, k, cutoff):
+
+    #Starting at 0 for each
+    zero = loop = cutoff_count = k_limit = 0
+
+    #We want to test for each n up to m 
+    for n in range(0, m):
+
+        #How does the sequence end?
+        reason = sequence_end(n, k, cutoff)
+
+        #We want to increase the relevant category
+        if reason == "zero":
+            zero = zero + 1
+        elif reason == "loop":
+            loop = loop + 1
+        elif reason == "cutoff":
+            cutoff_count = cutoff_count + 1
+        elif reason == "k_limit":
+            k_limit = k_limit + 1
+
+    #adds names
+    names = ['Terminates at 0', 'Loops', 'Goes above threshold', 'Goes beyond number of iterations']
+    
+    return names, [zero, loop, cutoff_count, k_limit]
+
+%timeit count_reason(20000, 30, 10**9)
