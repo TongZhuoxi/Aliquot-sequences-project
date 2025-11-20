@@ -34,6 +34,7 @@ def q8(n):
     print(len(odd_d)/len(deficient), "proportion of deficient numbers that are odd")
     print(len(even_d)/len(deficient), "proportion of deficient numbers that are even")
 
+
 #Plot s(n)
 def q8plot(n):
     x = np.array(range(1, n+1))
@@ -41,3 +42,52 @@ def q8plot(n):
     plt.plot(x, y)
     plt.show
 q8plot(200)
+
+
+
+
+
+
+
+
+
+
+def type_summation(n):
+    #So i'm defining a variable sum to be the summation of all the proper divisors of n
+    sum = s(n)
+    if sum > n:
+        return "abundant"
+    elif sum == n:
+        return "perfect"
+    else:
+        return "deficient"
+
+def count_of_sequences(A, k):
+
+    #Again starting at 0 for these
+    abundant = 0
+    perfect = 0
+    deficient = 0
+
+    #Defining a loop that goes from number 1 up to and including A - and for each of these numbers and aliquot sequence is generated
+    for n in range(1, A + 1):
+        #This part specifically generates the aliquot sequence for that n in the range 1 to A+1 (code from before)
+        sequence = a(n, k)
+
+        #Now defining a loop that goes through each term in the sequence and defines them based off of their sum of proper divisors (like above)
+        for each_term in sequence:
+
+            #Defining a variable category uses my previous function to classify each of the terms in this specific sequence
+            category = type_summation(each_term)
+
+            if category == "abundant":
+                abundant = abundant + 1
+            elif category == "perfect":
+                perfect = perfect + 1
+            else:
+                deficient = deficient + 1
+
+    print("For terms in aliquot sequences starting from 1 to " + str(A) + " with up to " + str(k) + " terms each:")
+    print("Abundant: " +str(abundant))
+    print("Perfect: " +str(perfect))
+    print("Deficient: " +str(deficient))
