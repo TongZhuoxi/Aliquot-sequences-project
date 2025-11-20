@@ -1,0 +1,77 @@
+## FINDING WHAT N REACH A PERFECT NUMBER
+iterations = 30
+limit = 10**9
+
+reaches_6 = []
+reaches_28 = []
+reaches_496 = []
+reaches_8128 = []
+
+loop_list = []
+perfect_numbers = [6, 28, 496, 8128]
+lists_pn = [reaches_6, reaches_28, reaches_496, reaches_8128]
+
+print(lists_pn)
+
+for n in range(20000):
+    
+    # creating a list of all sequences that loop, perfect or sociable
+    loop_n = detect_loop_tf(n, 10**9)
+    if loop_n == True:
+        loop_list.append(n)
+
+    # want to creat seperate loops for what perfect numbers each list reaches
+    aliquot_n = a(n, iterations, limit)
+    length_as = len(aliquot_n) - 1
+    for i in range(4):
+        ith_list = lists_pn[i]
+        if aliquot_n[length_as] == perfect_numbers[i]:
+            ith_list.append(n)
+        
+print(reaches_6)
+print(reaches_28)
+print(reaches_496)
+print(reaches_8128)
+
+## FINDING WHAT N REACH WHAT AMICABLE  NUMBERS !!
+
+amicable_numbers = [
+    220, 284, 
+    1184, 1210, 
+    2620, 2924, 
+    5020, 5564, 
+    6232, 6368,
+    10744, 10856, 
+    12285, 14595, 
+    17296, 18416
+]
+
+# one list for each sociable number (mirroring your original structure)
+reaches_amicable_lists = [[] for _ in amicable_numbers]
+
+loop_list = []
+
+for n in range(20000):
+    
+    # creating a list of all sequences that loop, perfect or sociable
+    loop_n = detect_loop_tf(n, 10**9)
+    if detect_loop_tf:  
+        loop_list.append(n)
+
+    # compute aliquot sequence
+    aliquot_n = a(n, iterations, limit)
+    length_as = len(aliquot_n) - 1
+
+    # test if the final value equals any sociable number 
+    for i in range(len(amicable_numbers)): 
+        ith_list = reaches_amicable_lists[i]
+        if aliquot_n[length_as] == amicable_numbers[i]: 
+            ith_list.append(n)
+
+
+# print each list
+for lst in reaches_amicable_lists:
+    print(lst)
+
+    # NOTE : DOES NOT STORE IN PAIRS
+    
