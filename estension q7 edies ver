@@ -74,4 +74,75 @@ for lst in reaches_amicable_lists:
     print(lst)
 
     # NOTE : DOES NOT STORE IN PAIRS
-    
+
+ 
+# plotting graph - plotting the three different types of loop, and when they hit the sociable number. 
+plt.figure(figsize=(8,6))
+
+it = 30
+lim = 10**9
+it_samples = (list(range(0, it)))
+# 5 cases of this random test
+plt.plot(it_samples, a(16934, it, lim), color='purple' , label='aliquot sequence of 16934')
+plt.plot(it_samples, a(13058, it, lim), color='blue', label='aliquot sequence of 13058')
+plt.plot(it_samples, a(18922, it, lim), color='red', label='aliquot sequence of 18922')
+
+plt.axhline
+plt.axhline(y = 8128, color='plum' , label='y = 8128 (perfect number)' , linestyle = '--')
+plt.axhline(y = 5564, color='lightblue', label='y = 5564 (amicable number)', linestyle = '--')
+plt.axhline(y = 12496, color='lightcoral', label='y = 12496 (sociable number)', linestyle = '--')
+
+
+plt.title('visualisation of the movements of looping aliquot sequences')
+plt.xlabel('$k$ - what term of the sequence it is')
+plt.ylabel('$s^k(n)$')
+plt.legend(fontsize = 7)
+
+plt.show()
+
+# plotting graph - sub loops, and how many n values can reach same loop
+plt.figure(figsize=(8,6))
+
+it = 30
+lim = 10**9
+it_samples = (list(range(0, it)))
+
+for n in reaches_2620:
+    plt.plot(it_samples, a(n, it, lim))
+
+line_2620 = plt.axhline(y = 2620, color='lightgray' , 
+                        label= 'y = 2620 (amicable number): once reached, enters loop' , 
+                        linestyle = '--')
+
+
+plt.title('visualisation of the movements of how sequences reach loops using 2620')
+plt.xlabel('$k$ - what term of the sequence it is')
+plt.ylabel('$s^k(n)$')
+plt.legend()
+
+plt.show()
+
+# pi charts - proportion of sociable numbers vs proportion of loops that reach them
+
+import matplotlib.pyplot as plt
+
+sizes_prop = [len(reaches_perfect), len(reaches_amicable), len(reaches_sociable)]
+sizes_freq = [len(perfect_numbers), len(amicable_numbers), len(sociable_numbers)]
+sizes = [sizes_prop, sizes_freq]
+
+labels = ["Perfect", "Amicable", "Sociable"]
+titles = ["Proportion of numbers that reach each type", 
+          'Frequency the type of number appears < 20,000']
+
+colors = ['purple', 'blue', 'red']
+
+fig, axes = plt.subplots(1, 2, figsize=(16, 8))
+
+for i in range(2):
+    axes[i].pie(sizes[i], labels=labels, autopct='%1.1f%%', startangle=90, colors=colors)
+    axes[i].set_title(titles[i])
+
+plt.tight_layout()
+plt.show()
+
+
