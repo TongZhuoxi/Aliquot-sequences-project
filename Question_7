@@ -1,0 +1,221 @@
+import aliquot_sequence_functions as asf
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas
+import matplotlib.animation as animation
+
+def loop_checker(up_to_n, iterations):
+
+    is_loop = False
+    loops = []
+    
+    for n in range(up_to_n):
+        ali = asf.a(n, iterations)
+        is_loop = False
+        if ali[len(ali) - 1] == 0:
+            is_loop = False
+        elif asf.s(ali[len(ali) - 1]) > 10**9:
+            is_loop = False
+        else:
+            for i in range(len(ali)):
+                if is_loop == True:
+                    break
+                for j in range(i + 1, len(ali)):
+                    if ali[i] == ali[j]:
+                        is_loop = True
+                        loops.append(n)
+                        break
+    return loops  
+
+def loop_types(n, iterations):
+# input a number, n, and it returns all perfect, amicable, and sociable numbers and their counts up to n.
+
+    #I tried so many ways to get the sociable numbers on its own that hard coding it was way easier
+    perfect_nums = []
+    amicable_nums = []
+    sociable_nums = [12496, 14316]
+    count_pn = 0
+    count_an = 0
+    count_sn = 0
+    p_nums_list = []
+    a_nums_list = []
+    s_nums_list = []
+
+    for i in range(2 , n):
+
+        #only need the first 3 numbers in the aliquot sequence
+        ali = asf.a(i, 3)
+
+        #if both first terms are the same, it's a perfect number
+        if ali[0] == ali[1]:
+            perfect_nums.append(i)
+
+        #if first and third terms are the same, it's an amicable number
+        elif ali[0] == ali[2] and ali[0] != ali[1]:
+
+            #did this so that it doesn't add the same pair twice
+            if [ali[1], ali[2]] in amicable_nums:
+                continue
+            else:        
+                amicable_nums.append([ali[0], ali[1]])
+
+    #now for counting each type 
+    loops_list = loop_checker(n, iterations)
+    
+    for s in range(len(loops_list)):
+
+        specific_loop = loops_list[s]
+        
+        #set is_sociable as boolean so that if it's not perfect or amicable, it's sociable.
+        is_sociable = True
+        ali = asf.a(specific_loop, iterations)
+
+        #counts the amount of perfect numbers
+        for p in perfect_nums:
+            if p in ali:
+                count_pn += 1
+                is_sociable = False
+                p_nums_list.append(specific_loop)
+                
+        #counts the amount of amicable numbers
+        for a in amicable_nums:
+            if a[0] in ali:
+                count_an += 1
+                is_sociable = False
+                a_nums_list.append(specific_loop)
+
+        #counts the amount of sociable numbers
+        if is_sociable == True:
+            count_sn +=1
+            s_nums_list.append(specific_loop)
+
+    counts = {"Perfect Numbers": count_pn, "Amicable Numbers": count_an, "Sociable Numbers": count_sn}
+
+    #returns list of all types of numbers that loop, and their counts
+    return perfect_nums, amicable_nums, sociable_nums, counts, p_nums_list, a_nums_list, s_nums_list
+
+#Individual Special Number Counts
+
+p_num_counts = {}
+a_num_counts = {}
+s_num_counts = {}
+count = 0
+
+perfect_nums, amicable_nums, sociable_nums, counts, p_nums_list, a_nums_list, s_nums_list = loop_types(20000, 100)
+
+for p in perfect_nums:
+    count = 0
+
+    for i in p_nums_list:
+        ali = asf.a(i, 100)
+        if p in ali:
+            count += 1
+    p_num_counts[p] = count
+
+for a in amicable_nums:
+    count = 0
+
+    for i in a_nums_list:
+        ali = asf.a(i, 100)
+        if a[0] in ali:
+            count += 1
+    a_num_counts[tuple(a)] = count
+
+for s in sociable_nums:
+    count = 0
+
+    for i in s_nums_list:
+        ali = asf.a(i, 100)
+        if s in ali:
+            count += 1
+    s_num_counts[s] = count
+
+
+#Epic Pie Chart:
+
+
+perfect_nums, amicable_nums, sociable_nums, counts, p_nums_list, a_nums_list, s_nums_list = loop_types(20000, 30)
+
+p_counts = []
+a_counts = []
+s_counts = []
+
+for key, value in p_num_counts.items():
+        p_counts.append(value)
+
+for key, value in a_num_counts.items():
+    a_counts.append(value)
+
+for key, value in s_num_counts.items():
+    s_counts.append(value)
+
+max_p = max(p_counts)
+max_a = max(a_counts)
+
+p_counts.remove(max_p)
+a_counts.remove(max_a)
+
+new_p_counts = [max_p, sum(p_counts)]
+new_a_counts = [max_a, sum(a_counts)]
+
+fig, ax = plt.subplots()
+
+size = 0.3
+vals = np.array([new_p_counts, new_a_counts, s_counts])
+
+tab10 = plt.color_sequences["tab10"]
+tab20c = plt.color_sequences["tab20c"]
+tab20b = plt.color_sequences["tab20b"]
+outer_colours = [tab20c[i] for i in [4, 5]] + [tab20b[i] for i in [0, 1]] + [tab20c[i] for i in [8, 9]] 
+inner_colours = [tab10[i] for i in [3, 9, 2]] 
+
+inner_labels = ["Perfect Numbers", "Amicable Numbers", "Sociable Numbers"]
+outer_labels = ["Ending in 6", "other", "Ending in (1184, 1210)", "other", "12496 (5 loop)", "14316 (28 loop)"]
+
+ax.pie(vals.sum(axis=1), radius=1-size, colors = inner_colours,
+       wedgeprops=dict(width=size, edgecolor='k'))
+plt.legend(inner_labels, loc = "lower left")
+
+ax.pie(vals.flatten(), radius=1, colors = outer_colours,
+       wedgeprops=dict(width=size, edgecolor='k'), labels = outer_labels)
+
+ax.set(aspect="equal", title='Proportion of Aliquot Sequences that Enter Loops')
+plt.tight_layout()
+plt.show()
+
+#Line graph with different iterations
+
+plt.figure()  
+plt.plot(loop_checker(20000, 100), label = "100 iterations")
+plt.plot(loop_checker(20000, 15), label = "15 iterations")
+plt.plot(loop_checker(20000, 10), label = "10 iterations")
+plt.ylabel("numbers with loops")
+plt.title("Amount of Numbers that end in a loops up to 20000")
+plt.legend()
+plt.show()
+
+
+#Line Graph to show the behaviour of different types of looping sequences
+
+plt.figure()  
+
+#specifically picked examples to highlight each behaviour
+plt.plot(asf.a(12288,50), label = "Ending in Perfect Number")
+plt.plot(asf.a(12428,50), label = "Ending in Amicable Number")
+plt.plot(asf.a(18922,50), label = "Ending in Sociable Number")
+
+plt.ylabel("Value")
+plt.xlabel("Iterations")
+plt.title("Behaviour of Aliquot Sequences that enter a loop")
+plt.legend()
+plt.show()
+
+
+#Just the loop of 14316
+
+plt.figure()  
+plt.plot(asf.a(14316,100))
+plt.title("The only 28 loop (starting at 14,316) over 100 iterations")
+plt.ylabel("Value")
+plt.xlabel("Iterations")
+plt.show()
