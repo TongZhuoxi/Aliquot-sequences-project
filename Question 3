@@ -1,3 +1,11 @@
+# Question: Find a way to detect loops. (There’s a little bit to this – look at the sequence starting at 562 to see why.)
+# Write up:
+# We have been asked to find a way to detect loops within aliquot sequences. Our thought process essentially consisted of 
+# compiling a list of terms from the aliquot sequence of n, which DON'T repeat. For every next term in the sequence, we then 
+# would check it against this list that we're constantly adding to. If it's not in the list, then we add it to the list 
+# because it hasn't repeated! If it is in the list, then this term has repeated and created a loop. We exit the while loop 
+# and print out the sequence up to the term before it repeats and make it known the number the sequence loops from.
+
 def detect_loop(n):
 
     #We want to create a list of the values in the aliquot sequence for n so we know if a value repeats
