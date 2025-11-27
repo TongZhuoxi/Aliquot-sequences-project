@@ -91,3 +91,128 @@ def count_of_sequences(A, k):
     print("Abundant: " +str(abundant))
     print("Perfect: " +str(perfect))
     print("Deficient: " +str(deficient))
+
+
+
+# I want to now focus on convergence of aliquot sequences ... i think this is going to be hard! I first need to create some code that will 
+# establish the length of aliquot sequences when they end (for whatever reason) - i'm going to essentially add onto/use the code from question 4
+
+def sequence_length(n, k, cutoff):
+    
+    #Creating a set that initially contains n and used to store terms that haven't repeated yet
+    repeats = [n]
+    #Currently there's only 1 term in the sequence, so the length is 1
+    length = 1
+
+    #Generate k terms 
+    for i in range(k - 1):
+
+        #Want to find the next term in the sequence
+        next_term = s(n)
+
+        #Ending 1 - terminates at 0
+        if next_term == 0:
+            length = length + 1
+            return "zero", length
+
+        #Ending 2 - term exceeds i
+        if next_term > cutoff:
+            length = length + 1
+            return "cutoff", length 
+
+        #Ending 3 - term repeats
+        if next_term in repeats:
+            length = length + 1
+            return "loop", length
+
+        #If term NOT in 'repeats' - add this term to set of repeats and continue sequence
+        repeats.append(next_term)
+        n = next_term
+        length = length + 1
+
+    #Ending 4 - greater than k terms - has to be this if it's not the others?     
+    return "k_limit", length
+
+
+#Following the pattern of question 4, I now want to use the function I've just created to compute how aliquot sequences behave for every n, in the range (1, m)
+
+# m is the largest starting value, k is the maximum number of terms and cutoff is the largest value a term can have
+def convergence(m, k, cutoff):
+
+    #Starting at 0 for each
+    zero = loop = cutoff_count = k_limit = 0
+
+    #This will store the length of the sequence for each starting value n
+    lengths = []
+
+    #We want to test for each n from 1 up to m 
+    for n in range(1, m+1):
+
+        #How does the sequence end and how long is it?
+        reason, length = sequence_length(n, k, cutoff)
+
+        #I need this for when I want to start plotting something - it's storing length n=1, length n=2 etc
+        lengths.append(length)
+
+        #We want to increase the relevant category
+        if reason == "zero":
+            zero = zero + 1
+        elif reason == "loop":
+            loop = loop + 1
+        elif reason == "cutoff":
+            cutoff_count = cutoff_count + 1
+        elif reason == "k_limit":
+            k_limit = k_limit + 1
+
+    #adds names
+    names = ['Terminates at 0', 'Loops', 'Goes above threshold', 'Goes beyond number of iterations']
+    counts = [zero, loop, cutoff_count, k_limit]
+
+    print('The number of sequences that terminate at 0: ' + str(zero))
+    print('The number of sequences that terminate at a loop: ' + str(loop))
+    print('The number of sequences that terminate because a value of a term has exceeded i: ' + str(cutoff_count))
+    print('The number of sequences that terminate because they have more terms than k: ' + str(k_limit))
+    print('The lengths are: ' + str(lengths))
+
+    return names, counts, lengths
+
+
+#Plotting a bar chart first 
+
+m = 2000
+k = 70
+cutoff = 10**9
+
+#My function convergence(m, k, cutoff) returns 3 things: names, counts, lengths
+names, counts, lengths = convergence(m, k, cutoff)
+
+plt.figure(figsize=(10,6))
+plt.bar(names, counts)
+plt.xticks(rotation=15)
+plt.ylabel("Number of starting values")
+plt.title("How aliquot sequences end")
+plt.show()
+
+#Plotting a scatter graph 
+
+m = 2000
+k = 70
+cutoff = 10**9
+
+#My function convergence(m, k, cutoff) returns 3 things: names, counts, lengths
+names, counts, lengths = convergence(m, k, cutoff)
+
+#This is the set of starting values n, from 1 to m
+x_vals = range(1, m+1)
+#This is the list of sequence lengths returned by the convergence function above
+y_vals = lengths
+
+plt.figure(figsize = (15, 7))
+plt.scatter(x_vals, y_vals, s = 12)
+plt.xlabel('Starting value n')
+plt.ylabel('Sequence length')
+plt.title('Convergence speed of aliquot sequences (length vs n)')
+plt.grid(True, alpha = 0.3)
+plt.show()
+
+#This tells us that most sequences converge quickly because their lengths are quite short
