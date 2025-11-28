@@ -1,1 +1,44 @@
+# Question 2: Compute the aliquot sequence.
 
+As we know, an Aliquot Sequence is 
+$$A_n = \\(n, \ s(n), \ s^2(n), \ s^3(n), \ ...)\\ $$
+so all we need to do is repeat our $s(n)$ function repeatedly, while replacing the value of $n$ each time with a new $s(n)$.
+
+Difficulty arrises when we have very long Aliquot Sequences, so we have to include **parameters** so that our code doesn't take a long time to compute. These are:
+* Iterations
+* Upper Limit
+
+**Iterations** are the number of elements in the sequence. For loops and sequences that take longer to terminate at $0$, it's a good idea to have a cut off point so that the sequence doesn't go on infinitely (or takes too long to compute).
+
+**Upper Limit** is a specific value, a very large number, that is the upper bound to the sequence. Similarly to the iterations, this is to stop sequences from reaching exceedingly large values and potentially taking a long time to compute.  
+
+The standard parameters we used for most of this project, as in the project brief, was $n = 20,000$, iterations $= 30$, and upper limit $= 10^9$. But later we expanded these parameters in order to get better results when researching the behaviours of aliquot sequences.
+
+
+
+
+def a(n, iterations, upper_limit):
+    """Calculates the aliquot sequence of n within perameters Iterations and Upper Limit."""
+    
+    #the aliquot sequence of s(n) as a list, which is also the output.
+    aliquot_seq = [n]
+    
+    for i in range(iterations - 1):
+
+        next_term = s(n)
+        
+        #if s(n) = 0 then the sequence terminates.
+        if next_term == 0: 
+            aliquot_seq.append(sum_div)
+            return aliquot_seq
+
+        #if s(n) is bigger than the upper limit, then the sequence terminates    
+        elif next_term > upper_limit:
+            return aliquot_seq
+
+        #adds the current s(n) to the aliquot sequence and changes the input value to s(n)    
+        else:
+            aliquot_seq.append(sum_div)
+            n = next_term    
+            
+    return aliquot_seq
