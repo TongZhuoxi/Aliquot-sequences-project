@@ -1,0 +1,12 @@
+# Core 5: Effect of Parameter Choices
+
+The results of the classification in Core 4 depend on the choices of:
+
+$$
+k,\qquad i,\qquad \text{and the maximum starting value (up to 20000)}.
+$$
+
+Increasing these parameters generally produces a more accurate classification
+but also increases the runtime. The project brief suggests experimenting with
+different values of \( k \) and \( i \), and ensuring that the code still runs in a
+"reasonable" amount of time (around 30 seconds).
