@@ -11,6 +11,16 @@ but also increases the runtime. The project brief suggests experimenting with
 different values of \( k \) and \( i \), and ensuring that the code still runs in a
 "reasonable" amount of time (around 30 seconds).
 
+To get a clearer idea of how our parameter choices influence both the runtime and the 
+behaviour of the classification, we created a function called experiment_parameters. 
+Its job is simply to run through different combinations of M,k and i.For each set of values,
+we:
+#print the parameters we are currently using,
+#run count_reason(M, k, cutoff) to classify all starting numbers,
+#use time.time() to measure how long the classification takes, and
+#report the elapsed time so we can directly compare how the parameters affect performance.
+The corresponding code is shown below:
+
 # --- Question 5 ---
 import time
 
@@ -22,12 +32,12 @@ def experiment_parameters(M_list, k_list, i_list):
             for cutoff in i_list:# Loop over each cutoff threshold
                 print(f"\n--- Testing M={M}, k={k}, cutoff={cutoff} ---")
                 count_reason(M, k, cutoff)
-                start_time = time.time()
+                start_time = time.time()# start timer
 
-                count_reason(M, k, cutoff)
+                count_reason(M, k, cutoff)# run the classification once
                 print()
 
-                end_time = time.time()
+                end_time = time.time()# end timer
                 print("Elapsed time:", round(end_time - start_time, 3), "seconds")
 
 
