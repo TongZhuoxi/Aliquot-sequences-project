@@ -10,3 +10,31 @@ Increasing these parameters generally produces a more accurate classification
 but also increases the runtime. The project brief suggests experimenting with
 different values of \( k \) and \( i \), and ensuring that the code still runs in a
 "reasonable" amount of time (around 30 seconds).
+
+# --- Question 5 ---
+import time
+
+def experiment_parameters(M_list, k_list, i_list):
+    
+    for M in M_list:# Loop over each value of M (the maximum n)
+        print("Now testing with M =", M)
+        for k in k_list:# Loop over each iteration limit
+            for cutoff in i_list:# Loop over each cutoff threshold
+                print(f"\n--- Testing M={M}, k={k}, cutoff={cutoff} ---")
+                count_reason(M, k, cutoff)
+                start_time = time.time()
+
+                count_reason(M, k, cutoff)
+                print()
+
+                end_time = time.time()
+                print("Elapsed time:", round(end_time - start_time, 3), "seconds")
+
+
+
+# Example experiment (small values)
+experiment_parameters(
+    M_list=[20000], 
+    k_list=[10, 20, 50, 100],
+    i_list=[10**6, 10**9]
+)
