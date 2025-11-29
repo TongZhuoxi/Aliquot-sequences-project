@@ -29,7 +29,7 @@ def a(n, iterations, upper_limit):
         
         #if s(n) = 0 then the sequence terminates.
         if next_term == 0: 
-            aliquot_seq.append(sum_div)
+            aliquot_seq.append(next_term)
             return aliquot_seq
 
         #if s(n) is bigger than the upper limit, then the sequence terminates    
@@ -38,7 +38,7 @@ def a(n, iterations, upper_limit):
 
         #adds the current s(n) to the aliquot sequence and changes the input value to s(n)    
         else:
-            aliquot_seq.append(sum_div)
+            aliquot_seq.append(next_term)
             n = next_term    
             
     return aliquot_seq
