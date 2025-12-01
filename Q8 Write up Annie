@@ -1,1 +1,295 @@
+Haven't finished write up
+
+def type_summation(n):
+    #So i'm defining a variable sum to be the summation of all the proper divisors of n
+    sum = s(n)
+    if sum > n:
+        return "abundant"
+    elif sum == n:
+        return "perfect"
+    else:
+        return "deficient"
+
+def count_of_sequences(A, k):
+
+    #Again starting at 0 for these
+    abundant = 0
+    perfect = 0
+    deficient = 0
+
+    #Defining a loop that goes from number 1 up to and including A - and for each of these numbers and aliquot sequence is generated
+    for n in range(1, A + 1):
+        #This part specifically generates the aliquot sequence for that n in the range 1 to A+1 (code from before)
+        sequence = a(n, k)
+
+        #Now defining a loop that goes through each term in the sequence and defines them based off of their sum of proper divisors (like above)
+        for each_term in sequence:
+
+            #Defining a variable category uses my previous function to classify each of the terms in this specific sequence
+            category = type_summation(each_term)
+
+            if category == "abundant":
+                abundant = abundant + 1
+            elif category == "perfect":
+                perfect = perfect + 1
+            else:
+                deficient = deficient + 1
+
+    print("For terms in aliquot sequences starting from 1 to " + str(A) + " with up to " + str(k) + " terms each:")
+    print("Abundant: " +str(abundant))
+    print("Perfect: " +str(perfect))
+    print("Deficient: " +str(deficient))
+
+
+
+# I want to now focus on convergence of aliquot sequences ... i think this is going to be hard! I first need to create some code that will 
+# establish the length of aliquot sequences when they end (for whatever reason) - i'm going to essentially add onto/use the code from question 4
+
+def sequence_length(n, k, cutoff):
+    
+    #Creating a set that initially contains n and used to store terms that haven't repeated yet
+    repeats = [n]
+    #Currently there's only 1 term in the sequence, so the length is 1
+    length = 1
+
+    #Generate k terms 
+    for i in range(k - 1):
+
+        #Want to find the next term in the sequence
+        next_term = s(n)
+
+        #Ending 1 - terminates at 0
+        if next_term == 0:
+            length = length + 1
+            return "zero", length
+
+        #Ending 2 - term exceeds i
+        if next_term > cutoff:
+            length = length + 1
+            return "cutoff", length 
+
+        #Ending 3 - term repeats
+        if next_term in repeats:
+            length = length + 1
+            return "loop", length
+
+        #If term NOT in 'repeats' - add this term to set of repeats and continue sequence
+        repeats.append(next_term)
+        n = next_term
+        length = length + 1
+
+    #Ending 4 - greater than k terms - has to be this if it's not the others?     
+    return "k_limit", length
+
+
+#Following the pattern of question 4, I now want to use the function I've just created to compute how aliquot sequences behave for every n, in the range (1, m)
+
+# m is the largest starting value, k is the maximum number of terms and cutoff is the largest value a term can have
+def convergence(m, k, cutoff):
+
+    #Starting at 0 for each
+    zero = loop = cutoff_count = k_limit = 0
+
+    #This will store the length of the sequence for each starting value n
+    lengths = []
+
+    #We want to test for each n from 1 up to m 
+    for n in range(1, m+1):
+
+        #How does the sequence end and how long is it?
+        reason, length = sequence_length(n, k, cutoff)
+
+        #I need this for when I want to start plotting something - it's storing length n=1, length n=2 etc
+        lengths.append(length)
+
+        #We want to increase the relevant category
+        if reason == "zero":
+            zero = zero + 1
+        elif reason == "loop":
+            loop = loop + 1
+        elif reason == "cutoff":
+            cutoff_count = cutoff_count + 1
+        elif reason == "k_limit":
+            k_limit = k_limit + 1
+
+    #adds names
+    names = ['Terminates at 0', 'Loops', 'Goes above threshold', 'Goes beyond number of iterations']
+    counts = [zero, loop, cutoff_count, k_limit]
+
+    print('The number of sequences that terminate at 0: ' + str(zero))
+    print('The number of sequences that terminate at a loop: ' + str(loop))
+    print('The number of sequences that terminate because a value of a term has exceeded i: ' + str(cutoff_count))
+    print('The number of sequences that terminate because they have more terms than k: ' + str(k_limit))
+   # print('The lengths are: ' + str(lengths))
+
+    return names, counts, lengths
+
+
+#Plotting a bar chart first 
+
+m = 2000
+k = 70
+cutoff = 10**9
+
+#My function convergence(m, k, cutoff) returns 3 things: names, counts, lengths
+names, counts, lengths = convergence(m, k, cutoff)
+
+plt.figure(figsize=(10,6))
+plt.bar(names, counts)
+plt.xticks(rotation=15)
+plt.ylabel("Number of starting values")
+plt.title("How aliquot sequences end")
+plt.show()
+
+#Plotting a scatter graph 
+
+m = 2000
+k = 70
+cutoff = 10**9
+
+#My function convergence(m, k, cutoff) returns 3 things: names, counts, lengths
+names, counts, lengths = convergence(m, k, cutoff)
+
+#This is the set of starting values n, from 1 to m
+x_vals = range(1, m+1)
+#This is the list of sequence lengths returned by the convergence function above
+y_vals = lengths
+
+plt.figure(figsize = (15, 7))
+plt.scatter(x_vals, y_vals, s = 12)
+plt.xlabel('Starting value n')
+plt.ylabel('Sequence length')
+plt.title('Convergence speed of aliquot sequences (length vs n)')
+plt.grid(True, alpha = 0.3)
+plt.show()
+
+#This tells us that most sequences converge quickly because their lengths are quite short
+
+
+""" Function that finds all aliquot sequences up to n that loops within the inputted number of iterations by using the loop checkker function from question seven.
+It counts the number of abundant and deficient numbers in over all looping aliquot sequences and gives the proportion of abundant to deficient terms.
+
+"""
+def get_loop_cycle(aliquot_sequence):
+    """ We want to extract one cycle from a looping aliquot sequence.
+    Going through each term of the inputted aliquot sequence, the code notes the first time each number appears, 
+    and when a number appears a second time it returns the slice of the sequence between the first and second occurrence"""
+    #dictionary of previous values
+    seen = {}
+    #enumerate the sequence and loop through each term, comparing each term to our list of previous terms
+    for i, value in enumerate(aliquot_sequence):
+        if value in seen:
+            #slice to find the loop cycle: from where the loop started to the term before the repeating term
+            return aliquot_sequence[seen[value]:i]
+        seen[value] = i
+    #if no loop is found, return an empty list
+    return []
+
+def analyse_loops2(up_to_n, iterations):
+    """ We want to compare the number of abundant and deficient terms in aliquot sequences up to 'n'
+    """
+    #Create a list of looping aliquot sequences for all natural numbers up to n using the function loop_checker from Q7
+    looping = loop_checker(up_to_n, iterations)
+    total_loops = len(looping)
+    #We want to count the total number of abundant, deficient and perfect terms, so first we set the totals to 0
+    total_abundant = 0
+    total_deficient = 0
+    total_perfect = 0
+    #We want to see which perfect numbers are found in loops. We ignore duplicates by making a set.
+    perfect_numbers_overall = set()
+    #We create an empty list for ratios of abundant to deficient terms
+    ratios = []
+    print("Looping cycles with a different number of abundant and deficient terms (if any)")
+    
+    """ We loop through each looping sequences, extracting the looping cycle and analysing it"""
+    for l in looping:
+        aliquot = a(l, iterations, 10**9)
+        #Extracts the one cycle of the repeating section of the aliquot sequence
+        loop_cycle = get_loop_cycle(aliquot) 
+        #We want to count the number of each type of term
+        abundant = 0
+        deficient = 0
+        perfect = 0
+        #For each term in the looping cycle we increase the tally of perfect/abundant/deficient numbers
+        for n in loop_cycle:
+            n_type = type_summation(n)
+            if n_type == "perfect":
+                perfect += 1
+                #If the loop is a repeating perfect number we add this number to our set of perfect nubmers
+                perfect_numbers_overall.add(n)
+            elif n_type == "abundant":
+                abundant += 1
+            elif n_type == "deficient":
+                deficient += 1
+        # Sum up each tally to find overall totals
+        total_abundant += abundant
+        total_deficient += deficient
+        total_perfect += perfect
+        #The fraction (Number of abundant terms)/(Number of deficient terms) is only defined if the number of deficient terms is not equal to 0
+        if deficient != 0:
+            ratios.append(abundant / deficient)
+        #Loops with a different number of deficient to abundant terms are very rare so we want to print them for interest.
+        #As several aliquot sequences contain the same loop, starting at different places, we only consider loops that start at the smallest term
+        if l != min(loop_cycle):
+            continue
+        if abundant != deficient:
+            print(loop_cycle)
+            print(f"In this looping cycle there are {abundant} abundant numbers and {deficient} deficient numbers")
+
+    # Summary over all loops
+    print()
+    print(f"Summary of all loops up to {up_to_n} with less than {iterations} iterations:")
+    print()
+    print(f"Total number of loops detected: {total_loops}")
+    print(f"Total number of  abundant numbers in loops detected: {total_abundant}")
+    print(f"Total number deficient numbers in loops detecttted: {total_deficient}")
+    print(f"Total number perfect numbers in loops detected: {total_perfect}")
+    print(f"Set of perfect numbers observed: {sorted(list(perfect_numbers_overall))}")
+    avg_ratio = sum(ratios) / len(ratios)
+    print("Average value of the fraction: (abundant numbers)/(deficient numbers) across loops:", avg_ratio)
+
+
+
+analyse_loops2(15000,30)
+
+As the total abundant numbers is very simlar to total deficient numbers we can see that cycles are relatively stable. No loops are purely abundant or deficient, which makes sense since purely abundant cycles would grow infinitely and purely deficient cycles would shrink to 0. This is why loops exist at all: s(n) produces repeating sequences only when upward and downward moves offset each other.
+
+def q8plot(n):
+    # plotting a line plot after changing it's width and height
+    f = plt.figure()
+    f.set_figwidth(15)
+    f.set_figheight(15)
+    x = np.array(range(1, n+1))
+    s_n = np.array([s(k) for k in x])
+    even_mask = (s_n % 2 == 0)
+    odd_mask  = ~even_mask  # same as (s_n % 2 == 1)
+    two_mask = (n)
+
+    even_s = s_n[even_mask]
+    odd_s  = s_n[odd_mask]
+  
+    plt.scatter(x[even_mask], even_s, label = 'even s(n)', s=(5), color = 'hotpink')
+    plt.scatter(x[odd_mask], odd_s, label = 'odd s(n)', s=(5), color = 'gold')
+    plt.plot(x, x, label = 'n = s(n)', linewidth=(0.7))
+    #find line of best fit
+    a, b = np.polyfit(x, s_n, 1)
+    #add line of best fit to plot
+    #plt.plot(x, a*x+b, linewidth = (0.7), color = ("black"), label = 'line of best fit of s(n)')
+    plt.xlabel('n')
+    plt.ylabel('s(n)')
+    plt.title('Value of s(n) as n increases up to 3000')
+    plt.legend()
+    plt.grid()
+    '''
+    plt.xticks(np.arange(0, n+1, 2))
+    plt.grid(axis='x')
+    '''
+    plt.show
+q8plot(3000)
+
+The graph shows the value of s(n) for each integer n up to 3000. We plotted the blue line n = s(n) to allow us to visually compare the the distribution of abundant and deficient numbers. The points above the blue line represent abundant numbers and the points below the line represent deficient numbers.
+
+There are many points along the horizontal line s(n) = 1, which represent prime numbers up to 3000.
+
+It is evident that that deficient numbers are more common than abundant numbers for integers. Nearly all abundant numbers are even, which is predictable since even numbers tend to have more factors.
 
